@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description"
+    content="Recipe Recommender — find recipes based on ingredients you have, with dietary filters, example queries and usage tips." />
+  <meta name="author" content="Recipe Recommender" />
+  <title>Recipe Recommender</title>
+
+  <link rel="stylesheet" href="styles.css" />
+  <!-- Optional helper script for small UI behaviors; keep if used -->
+  <script src="styles.js" defer></script>
+
+  <style>
+    /* Minimal inline improvements so file is useful even without styles.css */
+    body {
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+      margin: 24px;
+      color: #222
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    .controls {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      flex-wrap: wrap;
+      margin-bottom: 12px;
+    }
+
+    .filters {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .hint {
+      color: #666;
+      font-size: 0.95rem;
+      margin-top: 4px;
+    }
+
+    #recipeContainer {
+      margin-top: 20px;
+      display: grid;
+      gap: 12px;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    }
+
+    .recipe-card {
+      border: 1px solid #e0e0e0;
+      padding: 12px;
+      border-radius: 8px;
+      background: #fff;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03)
+    }
+
+    footer {
+      margin-top: 28px;
+      color: #666;
+      font-size: 0.9rem;
+    }
+
+    .example-list {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      margin-top: 6px;
+    }
+
+    .chip {
+      padding: 6px 8px;
+      background: #f3f3f3;
+      border-radius: 999px;
+      cursor: pointer;
+      font-size: 0.9rem;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <header>
+      <h1>🍽️ Recipe Recommender</h1>
+      <p class="hint">Enter ingredients you already have, choose filters, then click "Find Recipes" to get suggestions.
+      </p>
+    </header>
+
+    <section class="ingredient-selector" aria-labelledby="ingredientLabel">
+      <label id="ingredientLabel">Select Ingredients</label>
+      <div class="controls">
+        <input type="text" id="ingredientInput" placeholder="e.g. chickpeas, tomatoes, garlic"
+          aria-label="Ingredients input" />
+        <button id="findBtn" onclick="getRecipes()">Find Recipes</button>
+
+        <div class="filters" aria-label="Dietary filters" role="group">
+          <label><input type="checkbox" id="filterVegetarian" /> Vegetarian</label>
+          <label><input type="checkbox" id="filterVegan" /> Vegan</label>
+          <label><input type="checkbox" id="filterGlutenFree" /> Gluten-free</label>
+          <label><input type="checkbox" id="filterDairyFree" /> Dairy-free</label>
+          <label><input type="checkbox" id="filterNutFree" /> Nut-free</label>
+        </div>
+      </div>
+
+      <p class="hint">Tips: separate multiple ingredients with commas. Try clicking an example below.</p>
+      <div class="example-list" aria-hidden="false">
+        <span class="chip" onclick="fillExample('chickpeas, garlic, lemon')">chickpeas + garlic</span>
+        <span class="chip" onclick="fillExample('tomatoes, basil, mozzarella')">tomatoes + basil</span>
+        <span class="chip" onclick="fillExample('rice, eggs, soy sauce')">rice + eggs</span>
+        <span class="chip" onclick="fillExample('potatoes, onion, rosemary')">potatoes + rosemary</span>
+      </div>
+    </section>
+
+    <section id="results" aria-live="polite">
+      <h2 id="resultsTitle">Results</h2>
+      <div id="recipeContainer" role="list" aria-label="Recipe results"></div>
+      <p id="noResults" class="hint" style="display:none;">No recipes found. Try different ingredients or remove strict
+        filters.</p>
+    </section>
+
+    <section aria-labelledby="howTitle" style="margin-top:18px;">
+      <h3 id="howTitle">How to use</h3>
+      <ol>
+        <li>Type ingredients you have (commas allowed).</li>
+        <li>Optionally select dietary filters.</li>
+        <li>Click "Find Recipes". Results show a short summary, ingredients used and a rough cook time.</li>
+      </ol>
+
+      <h4>What this app does</h4>
+      <p class="hint">This frontend collects your input and delegates searching to the connected recipe engine (local
+        script or API). Make sure script.js implements the getRecipes() function and reads filters by element IDs.</p>
+    </section>
+
+    <footer>
+      <p>Recipe Recommender — v1.1 · <a href="privacy.html">Privacy</a> · <a href="contact.html">Contact</a></p>
+      <p>Made with care · Tips: keep frequently used ingredients saved locally for faster queries.</p>
+    </footer>
+  </div>
+
+  <script src="script.js" defer></script>
+  <script>
+    // small helpers to improve UX (do not overwrite existing functions)
+    function fillExample(text) {
+      const input = document.getElementById('ingredientInput');
+      if (!input) return;
+      input.value = text;
+      input.focus();
+    }
+
+    // show a friendly placeholder UI if getRecipes isn't defined yet
+    document.getElementById('findBtn').addEventListener('click', function () {
+      if (typeof getRecipes !== 'function') {
+        const container = document.getElementById('recipeContainer');
+        container.innerHTML = '<div class="recipe-card"><strong>Demo:</strong> Implement getRecipes() in script.js to fetch and render recipe cards here.</div>';
+        document.getElementById('noResults').style.display = 'none';
+      }
+    });
+  </script>
+</body>
+
+</html>
